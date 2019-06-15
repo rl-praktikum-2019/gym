@@ -574,6 +574,13 @@ for reward_type in ['sparse', 'dense']:
         max_episode_steps=100,
     )
 
+    # Multi Hand
+    register(
+        id='MultiHandInteraction{}-v0'.format(suffix),
+        entry_point='gym.envs.robotics:MultiHandInteractionEnv',
+        kwargs=_merge({'target_position': 'random', 'target_rotation': 'xyz'}, kwargs),
+        max_episode_steps=100,
+    )
 # Atari
 # ----------------------------------------
 

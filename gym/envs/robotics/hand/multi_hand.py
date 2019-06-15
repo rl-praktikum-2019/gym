@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from gym import utils, error
-from gym.envs.robotics import rotations, hand_env
+from gym.envs.robotics import rotations, multi_hand_env
 from gym.envs.robotics.utils import robot_get_obs
 
 try:
@@ -20,18 +20,15 @@ def quat_from_angle_and_axis(angle, axis):
 
 
 # Ensure we get the path separator correct on windows
-MANIPULATE_BLOCK_XML = os.path.join('hand', 'manipulate_block.xml')
-MANIPULATE_EGG_XML = os.path.join('hand', 'manipulate_egg.xml')
-MANIPULATE_PEN_XML = os.path.join('hand', 'manipulate_pen.xml')
 MULTI_HAND_XML = os.path.join('hand', 'multi_hand_interaction.xml')
 
 
-class ManipulateEnv(hand_env.HandEnv, utils.EzPickle):
+class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
     def __init__(
         self, model_path, target_position, target_rotation,
         target_position_range, reward_type, initial_qpos={},
         randomize_initial_position=True, randomize_initial_rotation=True,
-        distance_threshold=0.01, rotation_threshold=0.1, n_substeps=20, relative_control=False,
+        distance_threshold=0.01, rotation_threshold=0.1, n_substeps=40, relative_control=False,
         ignore_z_target_rotation=False,
     ):
         """Initializes a new Hand manipulation environment.
@@ -73,7 +70,7 @@ class ManipulateEnv(hand_env.HandEnv, utils.EzPickle):
         assert self.target_position in ['ignore', 'fixed', 'random']
         assert self.target_rotation in ['ignore', 'fixed', 'xyz', 'z', 'parallel']
 
-        hand_env.HandEnv.__init__(
+        multi_hand_env.MultiHandEnv.__init__(
             self, model_path, n_substeps=n_substeps, initial_qpos=initial_qpos,
             relative_control=relative_control)
         utils.EzPickle.__init__(self)
@@ -195,7 +192,7 @@ class ManipulateEnv(hand_env.HandEnv, utils.EzPickle):
 
         # Run the simulation for a bunch of timesteps to let everything settle in.
         for _ in range(10):
-            self._set_action(np.zeros(20))
+            self._set_action(np.zeros(40))
             try:
                 self.sim.step()
             except mujoco_py.MujocoException:
@@ -272,29 +269,10 @@ class ManipulateEnv(hand_env.HandEnv, utils.EzPickle):
         }
 
 
-class HandBlockEnv(ManipulateEnv):
+class MultiHandInteractionEnv(ManipulateEnv):
     def __init__(self, target_position='random', target_rotation='xyz', reward_type='sparse'):
-        super(HandBlockEnv, self).__init__(
-            model_path=MANIPULATE_BLOCK_XML, target_position=target_position,
+        super(MultiHandInteractionEnv, self).__init__(
+            model_path=MULTI_HAND_XML, target_position=target_position,
             target_rotation=target_rotation,
             target_position_range=np.array([(-0.04, 0.04), (-0.06, 0.02), (0.0, 0.06)]),
             reward_type=reward_type)
-
-
-class HandEggEnv(ManipulateEnv):
-    def __init__(self, target_position='random', target_rotation='xyz', reward_type='sparse'):
-        super(HandEggEnv, self).__init__(
-            model_path=MANIPULATE_EGG_XML, target_position=target_position,
-            target_rotation=target_rotation,
-            target_position_range=np.array([(-0.04, 0.04), (-0.06, 0.02), (0.0, 0.06)]),
-            reward_type=reward_type)
-
-
-class HandPenEnv(ManipulateEnv):
-    def __init__(self, target_position='random', target_rotation='xyz', reward_type='sparse'):
-        super(HandPenEnv, self).__init__(
-            model_path=MANIPULATE_PEN_XML, target_position=target_position,
-            target_rotation=target_rotation,
-            target_position_range=np.array([(-0.04, 0.04), (-0.06, 0.02), (0.0, 0.06)]),
-            randomize_initial_rotation=False, reward_type=reward_type,
-            ignore_z_target_rotation=True, distance_threshold=0.05)
