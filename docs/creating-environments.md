@@ -70,3 +70,20 @@
   ```
 
 * After you have installed your package with `pip install -e gym-foo`, you can create an instance of the environment with `gym.make('gym_foo:foo-v0')`
+
+
+# How to create new robotics environment using Mujoco for Gym
+
+Structure:
+* gym/gym/envs/robotics: Holds envs for robotics. Each env is inherits on `class MyEnv(robot_env.RobotEnv)`. The env performs actions.
+
+* gym/gym/envs/robotics/assets: Holds textures, models and physics object definitions (joints, actuators etc). Work in this directory for new models and visual env setup. Watch out for distinct ids and names in xml-tags.
+
+* gym/gym/envs/robotics/hand: Holds the task logic f.e. for manipulating a object, reaching a position, or interactions between multiple hands. Work in this directory for new environment logics. (compute_reward, success, goal_distance)
+
+TODO in MD:
+- xml aufbau kapieren
+
+PS: Für uns sind alle xml und .py mit MultiHand im Namen gedacht.
+
+
