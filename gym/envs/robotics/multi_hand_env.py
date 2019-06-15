@@ -20,6 +20,7 @@ class MultiHandEnv(robot_env.RobotEnv):
     # ----------------------------
 
     def _set_action(self, action):
+        # TODO: shape increased from 20 to 40 for doubled arms -> consequences in rest of code?
         assert action.shape == (40,)
 
         ctrlrange = self.sim.model.actuator_ctrlrange
@@ -29,6 +30,7 @@ class MultiHandEnv(robot_env.RobotEnv):
             for i in range(self.sim.data.ctrl.shape[0]):
                 actuation_center[i] = self.sim.data.get_joint_qpos(
                     self.sim.model.actuator_names[i].replace(':A_', ':'))
+            # TODO: robot0 = left arm but robot1 right arm missing here
             for joint_name in ['FF', 'MF', 'RF', 'LF']:
                 act_idx = self.sim.model.actuator_name2id(
                     'robot0:A_{}J1'.format(joint_name))
@@ -40,6 +42,7 @@ class MultiHandEnv(robot_env.RobotEnv):
         self.sim.data.ctrl[:] = np.clip(self.sim.data.ctrl, ctrlrange[:, 0], ctrlrange[:, 1])
 
     def _viewer_setup(self):
+        # TODO: robot0 = left arm but robot1 right arm missing here
         body_id = self.sim.model.body_name2id('robot0:palm')
         lookat = self.sim.data.body_xpos[body_id]
         for idx, value in enumerate(lookat):

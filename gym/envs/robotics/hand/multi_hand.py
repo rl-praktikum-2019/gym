@@ -75,12 +75,14 @@ class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
             relative_control=relative_control)
         utils.EzPickle.__init__(self)
 
+    # TODO: our achieved goal is the constellation of one arm to another -> here it is just the joint of one i think
     def _get_achieved_goal(self):
         # Object position and rotation.
         object_qpos = self.sim.data.get_joint_qpos('object:joint')
         assert object_qpos.shape == (7,)
         return object_qpos
 
+    # TODO: our goal changed. distance is no longer desired block position/rotation vs current block position/rotation
     def _goal_distance(self, goal_a, goal_b):
         assert goal_a.shape == goal_b.shape
         assert goal_a.shape[-1] == 7
@@ -114,6 +116,7 @@ class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
     # GoalEnv methods
     # ----------------------------
 
+    #TODO: should fit if we adapt success, achieved goal and goal distance above
     def compute_reward(self, achieved_goal, goal, info):
         if self.reward_type == 'sparse':
             success = self._is_success(achieved_goal, goal).astype(np.float32)
@@ -127,6 +130,7 @@ class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
     # RobotEnv methods
     # ----------------------------
 
+    #TODO: success changed. we need to consider 2 arms 
     def _is_success(self, achieved_goal, desired_goal):
         d_pos, d_rot = self._goal_distance(achieved_goal, desired_goal)
         achieved_pos = (d_pos < self.distance_threshold).astype(np.float32)
