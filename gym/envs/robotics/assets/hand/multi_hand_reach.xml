@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco>
+    <compiler angle="radian" coordinate="local" meshdir="../stls/hand" texturedir="../textures"></compiler>
+    <option timestep="0.002" iterations="20" apirate="200">
+        <flag warmstart="enable"></flag>
+    </option>
+
+    <include file="multi_hand_shared.xml"></include>
+
+    <asset>
+        <include file="multi_hand_shared_asset.xml"></include>
+    </asset>
+
+    <worldbody>
+        <geom name="floor0" pos="1 1 0" size="1 1 1" type="plane" condim="3" material="floor_mat"></geom>
+        <body name="floor0" pos="1 1 0">
+            <site name="left_target0" pos="1 0 0" size="0.005" rgba="1 0 0 1" type="sphere"></site>
+            <site name="left_target1" pos="1 1 0" size="0.005" rgba="0 1 0 1" type="sphere"></site>
+            <site name="left_target2" pos="1 1 1" size="0.005" rgba="0 0 1 1" type="sphere"></site>
+            <site name="left_target3" pos="1 0 1" size="0.005" rgba="1 1 0 1" type="sphere"></site>
+            <site name="left_target4" pos="0 1 1" size="0.005" rgba="1 0 1 1" type="sphere"></site>
+
+            <site name="left_finger0" pos="0 0 0" size="0.01" rgba="1 0 0 0.2" type="sphere"></site>
+            <site name="left_finger1" pos="0 0 0" size="0.01" rgba="0 1 0 0.2" type="sphere"></site>
+            <site name="left_finger2" pos="0 0 0" size="0.01" rgba="0 0 1 0.2" type="sphere"></site>
+            <site name="left_finger3" pos="0 0 0" size="0.01" rgba="1 1 0 0.2" type="sphere"></site>
+            <site name="left_finger4" pos="0 0 0" size="0.01" rgba="1 0 1 0.2" type="sphere"></site>
+
+            <site name="right_target0" pos="1 0 0" size="0.005" rgba="1 0 0 1" type="sphere"></site>
+            <site name="right_target1" pos="0 1 0" size="0.005" rgba="0 1 0 1" type="sphere"></site>
+            <site name="right_target2" pos="0 0 1" size="0.005" rgba="0 0 1 1" type="sphere"></site>
+            <site name="right_target3" pos="1 1 0" size="0.005" rgba="1 1 0 1" type="sphere"></site>
+            <site name="right_target4" pos="1 0 1" size="0.005" rgba="1 0 1 1" type="sphere"></site>
+
+            <site name="right_finger0" pos="0 0 0" size="0.01" rgba="1 0 0 0.2" type="sphere"></site>
+            <site name="right_finger1" pos="0 0 0" size="0.01" rgba="0 1 0 0.2" type="sphere"></site>
+            <site name="right_finger2" pos="0 0 0" size="0.01" rgba="0 0 1 0.2" type="sphere"></site>
+            <site name="right_finger3" pos="0 0 0" size="0.01" rgba="1 1 0 0.2" type="sphere"></site>
+            <site name="right_finger4" pos="0 0 0" size="0.01" rgba="1 0 1 0.2" type="sphere"></site>
+        </body>
+
+        <include file="hand_left.xml"></include>
+        <include file="hand_right.xml"></include>
+
+        <light directional="true" ambient="0.2 0.2 0.2" diffuse="0.8 0.8 0.8" specular="0.3 0.3 0.3" castshadow="false" pos="0 0 4" dir="0 0 -1" name="light0"></light>
+    </worldbody>
+</mujoco>

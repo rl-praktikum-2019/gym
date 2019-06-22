@@ -581,6 +581,12 @@ for reward_type in ['sparse', 'dense']:
         kwargs=_merge({'target_position': 'random', 'target_rotation': 'xyz'}, kwargs),
         max_episode_steps=100,
     )
+    register(
+        id='MultiHandReach{}-v0'.format(suffix),
+        entry_point='gym.envs.robotics:MultiHandReachEnv',
+        kwargs=kwargs,
+        max_episode_steps=50,
+    )
 # Atari
 # ----------------------------------------
 

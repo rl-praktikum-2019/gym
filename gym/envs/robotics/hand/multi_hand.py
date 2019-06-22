@@ -18,12 +18,11 @@ def quat_from_angle_and_axis(angle, axis):
     quat /= np.linalg.norm(quat)
     return quat
 
-
 # Ensure we get the path separator correct on windows
 MULTI_HAND_XML = os.path.join('hand', 'multi_hand_interaction.xml')
 
-
-class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
+# TODO: we needed reach.py not manipulate.py ...
+class MultiHandManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
     def __init__(
         self, model_path, target_position, target_rotation,
         target_position_range, reward_type, initial_qpos={},
@@ -273,7 +272,7 @@ class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
         }
 
 
-class MultiHandInteractionEnv(ManipulateEnv):
+class MultiHandInteractionEnv(MultiHandManipulateEnv):
     def __init__(self, target_position='random', target_rotation='xyz', reward_type='sparse'):
         super(MultiHandInteractionEnv, self).__init__(
             model_path=MULTI_HAND_XML, target_position=target_position,
