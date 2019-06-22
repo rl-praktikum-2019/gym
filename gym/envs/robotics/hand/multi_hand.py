@@ -130,7 +130,7 @@ class ManipulateEnv(multi_hand_env.MultiHandEnv, utils.EzPickle):
     # RobotEnv methods
     # ----------------------------
 
-    #TODO: success changed. we need to consider 2 arms 
+    #TODO: success changed. we need to consider 2 arms
     def _is_success(self, achieved_goal, desired_goal):
         d_pos, d_rot = self._goal_distance(achieved_goal, desired_goal)
         achieved_pos = (d_pos < self.distance_threshold).astype(np.float32)
