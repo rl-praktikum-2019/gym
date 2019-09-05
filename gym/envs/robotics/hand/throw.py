@@ -75,6 +75,23 @@ class ThrowEnv(hand_env.HandEnv):
             self, model_path, n_substeps=n_substeps, initial_qpos=initial_qpos,
             relative_control=relative_control)
 
+    def _viewer_setup(self):
+        body_id = self.sim.model.body_name2id('robot0:palm')
+        lookat = self.sim.data.body_xpos[body_id]
+        for idx, value in enumerate(lookat):
+            self.viewer.cam.lookat[idx] = value
+        self.viewer.cam.distance = 0.8
+        self.viewer.cam.azimuth = 0.
+        self.viewer.cam.elevation = 0.
+
+    def step(self, action):
+        obs, reward, done, info = super(ThrowEnv, self).step(action)
+        object_qpos = self.sim.data.get_joint_qpos('object:joint')
+        # Stop episode if ball is dropped
+        if object_qpos[2] <= 0.03:
+            done = True
+
+        return obs, reward, done, info
 
     def _get_achieved_goal(self):
         # Object position and rotation.
@@ -116,11 +133,16 @@ class ThrowEnv(hand_env.HandEnv):
     # ----------------------------
 
     def compute_reward(self, achieved_goal, goal, info):
+        object_qpos = self.sim.data.get_joint_qpos('object:joint')
+        # Penalize ball drops
+        if object_qpos[2] <= 0.03:
+            return -20
         if self.reward_type == 'sparse':
             success = self._is_success(achieved_goal, goal).astype(np.float32)
             return (success - 1.)
         else:
             d_pos, d_rot = self._goal_distance(achieved_goal, goal)
+            print(d_pos)
             # We weigh the difference in position to avoid that `d_pos` (in meters) is completely
             # dominated by `d_rot` (in radians).
             return -(10. * d_pos + d_rot)
@@ -207,9 +229,9 @@ class ThrowEnv(hand_env.HandEnv):
             assert self.target_position_range.shape == (3, 2)
             offset = self.np_random.uniform(self.target_position_range[:, 0], self.target_position_range[:, 1])
             assert offset.shape == (3,)
-            target_pos = self.sim.data.get_joint_qpos('object:joint')[:3] + offset
+            target_pos = self.sim.data.get_joint_qpos('target:joint')[:3] + offset
         elif self.target_position in ['ignore', 'fixed']:
-            target_pos = self.sim.data.get_joint_qpos('object:joint')[:3]
+            target_pos = self.sim.data.get_joint_qpos('target:joint')[:3]
         else:
             raise error.Error('Unknown target_position option "{}".'.format(self.target_position))
         assert target_pos is not None
@@ -232,7 +254,8 @@ class ThrowEnv(hand_env.HandEnv):
             axis = self.np_random.uniform(-1., 1., size=3)
             target_quat = quat_from_angle_and_axis(angle, axis)
         elif self.target_rotation in ['ignore', 'fixed']:
-            target_quat = self.sim.data.get_joint_qpos('object:joint')
+            qpos = self.sim.data.get_joint_qpos('target:joint')
+            target_quat = qpos[3:]
         else:
             raise error.Error('Unknown target_rotation option "{}".'.format(self.target_rotation))
         assert target_quat is not None
@@ -250,8 +273,8 @@ class ThrowEnv(hand_env.HandEnv):
         if self.target_position == 'ignore':
             # Move the object to the side since we do not care about it's position.
             goal[0] += 0.15
-        #self.sim.data.set_joint_qpos('target:joint', goal)
-        #self.sim.data.set_joint_qvel('target:joint', np.zeros(6))
+        self.sim.data.set_joint_qpos('target:joint', goal)
+        self.sim.data.set_joint_qvel('target:joint', np.zeros(6))
 
         if 'object_hidden' in self.sim.model.geom_names:
             hidden_id = self.sim.model.geom_name2id('object_hidden')
@@ -271,7 +294,7 @@ class ThrowEnv(hand_env.HandEnv):
 
 
 class ThrowBallEnv(ThrowEnv, utils.EzPickle):
-    def __init__(self, target_position='random', target_rotation='xyz', reward_type='sparse'):
+    def __init__(self, target_position='fixed', target_rotation='ignore', reward_type='sparse'):
         utils.EzPickle.__init__(self, target_position, target_rotation, reward_type)
         ThrowEnv.__init__(self,
             model_path=THROW_BALL_XML, target_position=target_position,
