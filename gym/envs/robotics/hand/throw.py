@@ -142,7 +142,6 @@ class ThrowEnv(hand_env.HandEnv):
             return (success - 1.)
         else:
             d_pos, d_rot = self._goal_distance(achieved_goal, goal)
-            print(d_pos)
             # We weigh the difference in position to avoid that `d_pos` (in meters) is completely
             # dominated by `d_rot` (in radians).
             return -(10. * d_pos + d_rot)
