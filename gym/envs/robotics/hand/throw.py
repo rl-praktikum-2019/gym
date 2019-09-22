@@ -281,7 +281,7 @@ class ThrowEnv(hand_env.HandEnv):
         robot_qpos, robot_qvel = robot_get_obs(self.sim)
         object_qvel = self.sim.data.get_joint_qvel('object:joint')
         achieved_goal = self._get_achieved_goal().ravel()  # this contains the object position + rotation
-        observation = np.concatenate([robot_qpos, robot_qvel, object_qvel, achieved_goal])
+        observation = np.concatenate([robot_qpos, robot_qvel, object_qvel[:3], achieved_goal[:3]])
         return {
             'observation': observation.copy(),
             'achieved_goal': achieved_goal.copy(),
