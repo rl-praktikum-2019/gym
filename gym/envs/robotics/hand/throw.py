@@ -134,9 +134,6 @@ class ThrowEnv(hand_env.HandEnv):
 
     def compute_reward(self, achieved_goal, goal, info):
         object_qpos = self.sim.data.get_joint_qpos('object:joint')
-        # Penalize ball drops
-        if object_qpos[2] <= 0.03:
-            return -20
         if self.reward_type == 'sparse':
             success = self._is_success(achieved_goal, goal).astype(np.float32)
             return (success - 1.)
